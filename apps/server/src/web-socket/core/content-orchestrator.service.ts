@@ -34,6 +34,7 @@ import {
   CONTENT_SEEN_EVENTS,
   isVersionMismatchWithActiveSession,
   unsetActiveSessionOnVersionMismatch,
+  isResumeAllowedOnCurrentDomain,
 } from '@/utils/content-utils';
 import {
   buildExternalUserRoomId,
@@ -818,6 +819,20 @@ export class ContentOrchestratorService {
       return {
         success: false,
         reason: 'No latest activated content version found',
+      };
+    }
+
+    // Per-flow opt-in (config.restrictResumeToStartDomain): don't resume the
+    // flow on a different hostname than it started on. The session stays
+    // active; the auto-start strategy reuses it where start rules match.
+    if (
+      contentType === ContentDataType.FLOW &&
+      customContentVersion.config?.restrictResumeToStartDomain &&
+      !isResumeAllowedOnCurrentDomain(customContentVersion, socketData.clientContext?.pageUrl)
+    ) {
+      return {
+        success: false,
+        reason: 'Active session started on a different domain',
       };
     }
 

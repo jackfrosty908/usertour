@@ -2148,6 +2148,11 @@ const translations = {
         tooltip:
           "Temporarily hide the {{label}} while these conditions are true. Once they're no longer true, it can show up again. For example, hide the {{label}} on certain pages.",
       },
+      restrictResume: {
+        name: 'Only resume on the domain where it started',
+        tooltip:
+          "By default, a running flow follows the user to any page until it's dismissed. Turn this on to stop it from resuming on a different domain than the one it started on. On other domains the flow only shows if its auto-start conditions match there.",
+      },
       tracker: {
         eventSearchPlaceholder: 'Find or create an event...',
         noEventsDefined: 'No events defined yet.',

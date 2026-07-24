@@ -1,5 +1,5 @@
 import { useContentDetailUI } from '@/contexts/content-detail-ui-context';
-import { Card } from '@usertour/ui';
+import { Card, Label, QuestionTooltip, Switch } from '@usertour/ui';
 import { buildConfig } from '@usertour/helpers';
 import { ContentDataType, RulesCondition } from '@usertour/types';
 import { useCallback } from 'react';
@@ -87,6 +87,13 @@ export const ContentDetailSettings = () => {
     [config, debouncedUpdateVersion],
   );
 
+  const handleRestrictResumeChange = useCallback(
+    (checked: boolean) => {
+      debouncedUpdateVersion({ ...config, restrictResumeToStartDomain: checked });
+    },
+    [config, debouncedUpdateVersion],
+  );
+
   const handleHideRulesDataChange = useCallback(
     (enabled: boolean, conditions: RulesCondition[], setting: any) => {
       // Same scratch-state policy as autoStartRules — see comment above.
@@ -163,6 +170,26 @@ export const ContentDetailSettings = () => {
               disabled={isViewOnly}
               featureTooltip={HideRulesTooltips(contentType, t)}
             />
+          </Card>
+        )}
+
+        {contentType === ContentDataType.FLOW && (
+          <Card className="px-4 py-6 space-y-3">
+            <div className="items-center flex flex-row space-x-1">
+              <Switch
+                id="restrict-resume-to-start-domain"
+                checked={!!config.restrictResumeToStartDomain}
+                disabled={isViewOnly}
+                className="data-[state=unchecked]:bg-input"
+                onCheckedChange={handleRestrictResumeChange}
+              />
+              <Label htmlFor="restrict-resume-to-start-domain" className="font-normal">
+                {t('contents.overview.restrictResume.name')}
+              </Label>
+              <QuestionTooltip className="ml-1" contentClassName="max-w-sm">
+                {t('contents.overview.restrictResume.tooltip')}
+              </QuestionTooltip>
+            </div>
           </Card>
         )}
       </div>

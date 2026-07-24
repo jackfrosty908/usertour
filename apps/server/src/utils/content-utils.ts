@@ -537,6 +537,47 @@ export const isAllowedByHideRules = (
 };
 
 /**
+ * Extracts the hostname from a URL, or undefined when missing or unparseable
+ */
+const parseHostname = (url?: string): string | undefined => {
+  if (!url) {
+    return undefined;
+  }
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return undefined;
+  }
+};
+
+/**
+ * Checks if the active flow session may resume on the current page: the
+ * current hostname must match the one on the session's FLOW_STARTED event.
+ * Fails open when either hostname is unavailable.
+ * @param customContentVersion - The content version carrying the active session
+ * @param currentPageUrl - The page URL from the client context
+ * @returns True if the session may resume on the current page
+ */
+export const isResumeAllowedOnCurrentDomain = (
+  customContentVersion: CustomContentVersion,
+  currentPageUrl: string | undefined,
+): boolean => {
+  const bizEvents = customContentVersion.session?.activeSession?.bizEvent;
+  const startEvent = bizEvents?.find(
+    (bizEvent) => bizEvent.event?.codeName === BizEvents.FLOW_STARTED,
+  );
+  const startPageUrl = (startEvent?.data as Record<string, unknown> | undefined)?.[
+    EventAttributes.PAGE_URL
+  ];
+  const startHostname = parseHostname(typeof startPageUrl === 'string' ? startPageUrl : undefined);
+  const currentHostname = parseHostname(currentPageUrl);
+  if (!startHostname || !currentHostname) {
+    return true;
+  }
+  return startHostname === currentHostname;
+};
+
+/**
  * Filters the available auto-start custom content versions
  * @param customContentVersions - The custom content versions
  * @param contentType - The content type

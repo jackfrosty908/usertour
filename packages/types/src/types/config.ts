@@ -215,4 +215,7 @@ export type ContentConfigObject = {
   hideRules: RulesCondition[];
   autoStartRulesSetting: autoStartRulesSetting;
   hideRulesSetting: any;
+  // Flow only: don't resume the session on a different hostname than it
+  // started on. Off when absent.
+  restrictResumeToStartDomain?: boolean;
 };
